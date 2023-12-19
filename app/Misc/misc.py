@@ -16,3 +16,20 @@ def convert_to_time(sublist):
 def convert_sublist(input_array):
     converted_times = [convert_to_time(sublist) for sublist in input_array]
     return converted_times
+
+"""import nltk
+import spacy
+# essential entity models downloads
+nltk.downloader.download('maxent_ne_chunker')
+nltk.downloader.download('words')
+nltk.downloader.download('treebank')
+nltk.downloader.download('maxent_treebank_pos_tagger')
+nltk.downloader.download('punkt')
+nltk.download('averaged_perceptron_tagger')
+
+
+import locationtagger
+place_entity = locationtagger.find_locations(text = address)
+
+
+print(place_entity.countries)"""

@@ -12,12 +12,16 @@ class Add_Driver(BaseModel):
 class AddDriver_loc(BaseModel):
     driver_id : int 
     current_location : str
+    lat : float
+    lon : float
     
     class Config:
         json_schema_extra = {
             "example": {
                 "driver_id" : 1,
-                "current_location": "l2b2"
+                "current_location": "l2b2",
+                "lat": "23.342",
+                "lon": "23.232"
             }
         }
 

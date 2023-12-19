@@ -1,5 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, CheckConstraint, Time,func,Date
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, Integer, String, ForeignKey, CheckConstraint, Time,func,Date, Float
 from .database_sql_doc import Base
 from sqlalchemy.dialects.postgresql import ARRAY
 
@@ -42,8 +41,8 @@ class Customer_Slots(Base):
     location = Column(ARRAY((String), dimensions=2), name='indivisual-location')
     
     __table_args__ = (
-        CheckConstraint(func.array_length(booking_slots, 1) == 2),
-        CheckConstraint(func.array_length(location, 1) == 2),
+        CheckConstraint(func.array_length(booking_slots, 0) == 2),
+        CheckConstraint(func.array_length(location, 0) == 2),
     )
     
 class Current_Location(Base):
@@ -52,6 +51,8 @@ class Current_Location(Base):
     driver_id = Column(Integer,ForeignKey("drivers.id",ondelete="CASCADE"))
     Driver_name = Column(String, nullable=False)
     current_location = Column(String, nullable=False)
+    lat = Column(Float, nullable= False)
+    lon = Column(Float, nullable= False)
     
     
 

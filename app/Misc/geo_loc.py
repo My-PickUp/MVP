@@ -11,16 +11,6 @@ def get_address_pincode_from_laton(latitude, longitude):
     
     return address, pincode 
 
-def get_lat_long_from_address(address):
-    geolocator = Nominatim(user_agent="my-geocoder")
-    
-    location = geolocator.geocode(address)
-    
-    latitude = location.latitude if location else None
-    longitude = location.longitude if location else None
-    return latitude, longitude
-
-
 def get_pincode_from_address(address):
     geolocator = Nominatim(user_agent="my-geocoder")
     location = geolocator.geocode(address)
@@ -36,6 +26,31 @@ def get_pincode_from_address(address):
     else:
         print("Geocoding failed for address:", address)
         return None
+
+def get_lat_long_from_address(address : str):
+    import requests
+
+
+    url = "https://maps-data.p.rapidapi.com/geocoding.php"
+
+
+    querystring = {"query":address,"lang":"en","country":"fr"}
+
+
+    headers = {
+    "X-RapidAPI-Key": "e5d677f092msh4fe5d9ac84e7f83p1c481fjsnf14ebc7fe6c7",
+    "X-RapidAPI-Host": "maps-data.p.rapidapi.com"
+    }
+
+
+    response = requests.get(url, headers=headers, params=querystring)
+
+    response = response.json()
+    
+    lat = response["data"]['lat']
+    long = response["data"]['lng']
+
+    return([lat,long])
     
 def geocodeing_data(address, api_key):
     base_url = "https://geocode.search.hereapi.com/v1/geocode"
@@ -95,3 +110,8 @@ def get_geocoding_data(address):
         print(f"Error: Unable to geocode address {address}")
         return None
     
+def driving_dst(orig_lat, orig_lon, dest_lat, dest_lon):
+    import geopy.distance as dst
+    origin = (orig_lat,orig_lon)
+    destination = (dest_lat,dest_lon)
+    return(dst.distance(origin, destination))
