@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from .. import model,schema
 from sqlalchemy import Time, Date,text,and_
 import datetime
-from datetime import time
+from datetime import time,datetime
 from typing import List
 
 model.Base.metadata.create_all(bind = engine)
@@ -124,42 +124,26 @@ WHERE driver_id NOT IN (
        print(driver_slot.date)
        
        """
+       pickup_time_str = "12:00:00"
+pickup_time_obj = datetime.strptime(pickup_time_str, "%H:%M:%S").time()
+       """
+       
+       start_time = datetime.strptime(start_time,"%H:%M:%S").time()
+       end_time = datetime.strptime(end_time, "%H:%M:%S").time()
+       
        new_slot = model.Driver_Slots(
         driver_id = driver_info['id'],
         driver_name = driver_info['Driver_name'],
         vehicle_number = driver_info['vehicle_number'],
-        booked_time_slot = [start_time,end_time],
+        booked_time_slot = [[start_time,end_time]],
         pincode = pincode,
         location = location,
-        booked_dates = driver_slot.date
+        booked_dates = [driver_slot.date]
         )
        db.add(new_slot)
-       db.commit()"""
-       
-       data = {
-  "dates": [
-    str(driver_slot.date)
-  ],
-  "driver_name": driver_info['Driver_name'],
-  "driver_vh_number": driver_info['vehicle_number'],
-  "location": [
-    [
-     location.replace(",",""),
-      driver_slot.drop_loc.replace(",","")
-    ],
-  ],
-  "pincode": [
-    pincode
-  ],
-  "slots": [
-    [
-      start_time,
-      end_time
-    ]
-  ]
-}
+       db.commit()
 
-       return {"output" : f"{data}"}
+       return {"output" : f"{new_slot}"}
        
     return {"ouput" : f"{records}"}
            
