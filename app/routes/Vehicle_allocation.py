@@ -136,8 +136,8 @@ pickup_time_obj = datetime.strptime(pickup_time_str, "%H:%M:%S").time()
         driver_name = driver_info['Driver_name'],
         vehicle_number = driver_info['vehicle_number'],
         booked_time_slot = [[start_time,end_time]],
-        pincode = pincode,
-        location = location,
+        pincode = [pincode],
+        location = [[location,driver_slot.drop_loc]],
         booked_dates = [driver_slot.date]
         )
        db.add(new_slot)
