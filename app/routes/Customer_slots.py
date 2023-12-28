@@ -90,7 +90,7 @@ def add_new_customer_slots(cust_slot : schema.Complete_slot, db:Session = Depend
                 shared_cust_list.append(customer_name)
                 co_passenger = i["co_passenger"]
                 assert len(co_passenger) != 1
-                shared_cust_list.append(customer_name)
+                shared_cust_list.append(co_passenger)
                 customer_id = db.query(model.Customers.id).filter(model.Customers.Customer_name == customer_name).first()
                 if customer_id == None:
                     customer_data = model.Customers(
