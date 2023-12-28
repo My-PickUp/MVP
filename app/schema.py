@@ -1,6 +1,6 @@
 from pydantic import BaseModel, validator
 from sqlalchemy import Time
-from typing import List, Tuple
+from typing import List, Tuple, Dict, Union
 from datetime import time,date,datetime
  
 class Add_Driver(BaseModel):
@@ -74,3 +74,31 @@ class AddDriverSlot(BaseModel):
                 "location": [["l1a1", "l2a2"], ["l3a3", "l4a4"]]
             }
         }
+        
+class Complete_slot(BaseModel):
+    
+    ride_date : date
+    ride_time : List[time]
+    ride_type : str
+    customers : List[Dict[str,Union[int,str]]]
+    pickup_loc: List[str]
+    drop_loc  : List[str]
+    
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "ride_date": "2023-12-27",
+                "ride_time": ["10:00:00","10:15:00"],
+                "ride_type": "string",
+                "customers": [
+                    {
+                        "customer_name": "ABC", 
+                        "drop_priority": 1,
+                        "co_passenger": "XYZ"
+                    }
+                ],
+                "pickup_loc": ["loc1","loc2"],
+                "drop_loc"  : ["loc3","loc4"]
+            }
+        }
+        

@@ -2,7 +2,7 @@ from fastapi import FastAPI, APIRouter,Depends
 from ..database_sql_doc import engine,get_db
 from sqlalchemy.orm import Session
 from .. import model,schema
-from sqlalchemy import Time, Date,text,and_
+from sqlalchemy import Time, Date,text
 import datetime
 from datetime import time,datetime
 from typing import List
@@ -54,6 +54,7 @@ def Add_slot(driver_slot : schema.AddDriverSlot, db : Session = Depends(get_db))
 def Driver_slots(driver_slot: schema.Slots, db: Session = Depends(get_db)):
     from ..Misc.misc import add_hours_to_time
     from ..Misc.geo_loc import get_lat_long_from_address, driving_dst,get_address_pincode_from_laton
+
     
     start_time = driver_slot.pickup_time
     
@@ -142,8 +143,18 @@ pickup_time_obj = datetime.strptime(pickup_time_str, "%H:%M:%S").time()
         )
        db.add(new_slot)
        db.commit()
+       
+       data = {
+           "driver_id" : driver_info['id'],
+        "driver_name" : driver_info['Driver_name'],
+        "vehicle_number" : driver_info['vehicle_number'],
+        "booked_time_slot" : [[start_time,end_time]],
+        "pincode" : [pincode],
+        "location" : [[location,driver_slot.drop_loc]],
+        "booked_dates" : [driver_slot.date]
+       }
 
-       return {"output" : f"{new_slot}"}
+       return {"output" : data}
        
     return {"ouput" : f"{records}"}
            
