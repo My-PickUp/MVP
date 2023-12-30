@@ -89,72 +89,76 @@ WHERE driver_id NOT IN (
     records = result.all()
     
     if records is not None:
-       driver_set = set()
-       temp_array = []
-       #the temp_array will be [dist, name]
-       [driver_set.add(j) for i in records for j in i ]
-       #iterate through each driver and check for each location
-       print(driver_set)
-       for i in driver_set:
-           driver_lat, driver_lon = db.query(model.Current_Location.lat, model.Current_Location.lon).filter(model.Current_Location.driver_id == i).first()
-           lat,lon = get_lat_long_from_address(driver_slot.pickup_loc)
-           print(f"driver latlon {driver_lat}, {driver_lon}")
-           print(f"latlon {lat}, {lon}")
-           #find the distance from the driver to the pickup loc and store it in the array 
-           #check if the driver has the location nearer to the previous location
-           driver_dist = driving_dst(driver_lat,driver_lon,lat,lon)
-           if len(temp_array) > 1 :
-               if driver_dist > temp_array[1]:
-                   temp_array[0] = i 
-                   temp_array[1] = driver_dist
-               else:
-                   pass 
-           else:
+        driver_set = set()
+        temp_array = []
+        #the temp_array will be [dist, name]
+        [driver_set.add(j) for i in records for j in i ]
+        #iterate through each driver and check for each location
+        print(driver_set)
+        for i in driver_set:
+            driver_lat, driver_lon = db.query(model.Current_Location.lat, model.Current_Location.lon).filter(model.Current_Location.driver_id == i).first()
+            lat,lon = get_lat_long_from_address(driver_slot.pickup_loc)
+            print(f"driver latlon {driver_lat}, {driver_lon}")
+            print(f"latlon {lat}, {lon}")
+            #find the distance from the driver to the pickup loc and store it in the array 
+            #check if the driver has the location nearer to the previous location
+            driver_dist = driving_dst(driver_lat,driver_lon,lat,lon)
+            if len(temp_array) > 1 :
+                if driver_dist > temp_array[1]:
+                    temp_array[0] = i 
+                    temp_array[1] = driver_dist
+                else:
+                    pass 
+            else:
                 temp_array.append(i)
                 temp_array.append(driver_dist)
-       #assign the driver to the slot
-       driver_details = db.query(model.Drivers).filter(model.Drivers.id == temp_array[0]).first()
-       driver_info = {**driver_details.__dict__}
-       
-       loc = get_address_pincode_from_laton(lat,lon)
-       location = loc[0]
-       pincode = loc[-1]
-       
-       print(driver_info, driver_slot.date)
-       
-       print(driver_slot.date)
-       
-       """
-       pickup_time_str = "12:00:00"
-pickup_time_obj = datetime.strptime(pickup_time_str, "%H:%M:%S").time()
-       """
-       
-       start_time = datetime.strptime(start_time,"%H:%M:%S").time()
-       end_time = datetime.strptime(end_time, "%H:%M:%S").time()
-       
-       new_slot = model.Driver_Slots(
-        driver_id = driver_info['id'],
-        driver_name = driver_info['Driver_name'],
-        vehicle_number = driver_info['vehicle_number'],
-        booked_time_slot = [[start_time,end_time]],
-        pincode = [pincode],
-        location = [[location,driver_slot.drop_loc]],
-        booked_dates = [driver_slot.date]
-        )
-       db.add(new_slot)
-       db.commit()
-       
-       data = {
-           "driver_id" : driver_info['id'],
-        "driver_name" : driver_info['Driver_name'],
-        "vehicle_number" : driver_info['vehicle_number'],
-        "booked_time_slot" : [[start_time,end_time]],
-        "pincode" : [pincode],
-        "location" : [[location,driver_slot.drop_loc]],
-        "booked_dates" : [driver_slot.date]
-       }
+        #assign the driver to the slot
+        try:
+            driver_details = db.query(model.Drivers).filter(model.Drivers.id == temp_array[0]).first()
+        except Exception as e:
+            print(f"error {e}")
 
-       return {"output" : data}
+        driver_info = {**driver_details.__dict__}
+       
+        loc = get_address_pincode_from_laton(lat,lon)
+        location = loc[0]
+        pincode = loc[-1]
+       
+        print(driver_info, driver_slot.date)
+       
+        print(driver_slot.date)
+       
+        """
+        pickup_time_str = "12:00:00"
+        pickup_time_obj = datetime.strptime(pickup_time_str, "%H:%M:%S").time()
+        """
+       
+        start_time = datetime.strptime(start_time,"%H:%M:%S").time()
+        end_time = datetime.strptime(end_time, "%H:%M:%S").time()
+       
+        new_slot = model.Driver_Slots(
+            driver_id = driver_info['id'],
+            driver_name = driver_info['Driver_name'],
+            vehicle_number = driver_info['vehicle_number'],
+            booked_time_slot = [[start_time,end_time]],
+            pincode = [pincode],
+            location = [[location,driver_slot.drop_loc]],
+            booked_dates = [driver_slot.date]
+            )
+        db.add(new_slot)
+        db.commit()
+       
+        data = {
+           "driver_id" : driver_info['id'],
+            "driver_name" : driver_info['Driver_name'],
+            "vehicle_number" : driver_info['vehicle_number'],
+            "booked_time_slot" : [[start_time,end_time]],
+            "pincode" : [pincode],
+            "location" : [[location,driver_slot.drop_loc]],
+            "booked_dates" : [driver_slot.date]
+        }
+
+        return {"output" : data}
        
     return {"ouput" : f"{records}"}
            

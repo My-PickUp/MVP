@@ -20,7 +20,7 @@ def convert_time_to_str(time_obj: time) -> str:
 
 def convert_date_to_str(date_obj : date) -> str:
     return(str(date_obj))
-
+ 
 @router.post("/customer-slots")
 def add_new_customer_slots(cust_slot : schema.Complete_slot, db:Session = Depends(get_db)):
     ride_date = cust_slot.ride_date
@@ -30,8 +30,8 @@ def add_new_customer_slots(cust_slot : schema.Complete_slot, db:Session = Depend
     pickup_locs = cust_slot.pickup_loc
     drop_locs = cust_slot.drop_loc
     
-    slot_av = db.query(model.AllSlots.customer_name).filter(model.AllSlots.booked_dates == ride_date).all()
-    
+    slot_av = db.query(model.AllSlots.customer_name).filter((model.AllSlots.booked_dates == ride_date)).filter(model.AllSlots.booked_time_slot[0] == ride_time[0]).all()
+    print(slot_av)    
     if len(slot_av) == 0:
         driver_slot_alot = "http://127.0.0.1:7000/Vehicle_allocation/alot-slots"
         payload_driver_slot  = {
@@ -42,10 +42,28 @@ def add_new_customer_slots(cust_slot : schema.Complete_slot, db:Session = Depend
         }
         
         try:
-            repsonse = httpx.post(driver_slot_alot, json=payload_driver_slot,timeout=120)
+            repsonse = httpx.post(driver_slot_alot, json=payload_driver_slot, timeout=120)
+            repsonse.raise_for_status()  # Raise an HTTPError for bad responses (non-2xx)
+    
             driver_alotted_Resp = repsonse.json()
+
+            if 'output' in driver_alotted_Resp:
+                print(driver_alotted_Resp['output'])
+                driver_alotted_Resp = driver_alotted_Resp['output']
+            else:
+                # Handle the case where 'output' is not present in the response
+                print("Error: 'output' not found in response.")
+                # Optionally, you can raise an exception or set a default value
+                raise HTTPException(status_code=500, detail="Unexpected response format")
+        except httpx.RequestError as e:
+            # Handle network-related errors
+            raise HTTPException(status_code=500, detail=f"Request error: {e}")
         except httpx.HTTPStatusError as e:
-            raise HTTPException(status_code= e.response.status_code , detail= f"error : {e}")
+            # Handle HTTP error responses
+            raise HTTPException(status_code=e.response.status_code, detail=f"HTTP error: No driver available {e}")
+        except httpx.DecodingError as e:
+            # Handle JSON decoding error
+            raise HTTPException(status_code=500, detail=f"JSON decoding error: {e}")
         
         print(driver_alotted_Resp['output'])
         
@@ -117,6 +135,9 @@ def add_new_customer_slots(cust_slot : schema.Complete_slot, db:Session = Depend
                     co_passenger = co_passenger
                 )
                 db.add(data)
-                db.commit()
+                db.commit()    
         else:
             raise HTTPException(status_code=405, detail="trying to book from more than customers in one private ride")
+        
+    else:
+        return{'slot already on that date time'}
