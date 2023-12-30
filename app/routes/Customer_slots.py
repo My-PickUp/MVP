@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from .. import model,schema
 import httpx
 from datetime import time,date
+from dataclasses import asdict
 
 model.Base.metadata.create_all(bind = engine)
 
@@ -29,6 +30,17 @@ def add_new_customer_slots(cust_slot : schema.Complete_slot, db:Session = Depend
     customer_data = cust_slot.customers
     pickup_locs = cust_slot.pickup_loc
     drop_locs = cust_slot.drop_loc
+    
+    print(ride_type)
+    
+    if (ride_type.lower() == "private"):
+        pass
+    elif (ride_type.lower() == "shared"):
+        pass
+    else:
+        raise HTTPException(status_code=400, detail="Invalid Ride Type! Please enter 'Private' or 'Shared'.")
+    
+    data_entry = None
     
     slot_av = db.query(model.AllSlots.customer_name).filter((model.AllSlots.booked_dates == ride_date)).filter(model.AllSlots.booked_time_slot[0] == ride_time[0]).all()
     print(slot_av)    
@@ -64,10 +76,6 @@ def add_new_customer_slots(cust_slot : schema.Complete_slot, db:Session = Depend
         except httpx.DecodingError as e:
             # Handle JSON decoding error
             raise HTTPException(status_code=500, detail=f"JSON decoding error: {e}")
-        
-        print(driver_alotted_Resp['output'])
-        
-        driver_alotted_Resp = driver_alotted_Resp['output']
         
         if ride_type.lower() == "private":
             for i in customer_data:
@@ -116,10 +124,8 @@ def add_new_customer_slots(cust_slot : schema.Complete_slot, db:Session = Depend
                     co_passenger = ""
                 )
                 db.add(data)
-                db.commit()
-                
-                return (data_entry)
-                 
+                db.commit() 
+                return{'output' : data_entry}
         elif ride_type.lower() == "shared":
             shared_cust_list = []
             for i in customer_data:
@@ -173,10 +179,8 @@ def add_new_customer_slots(cust_slot : schema.Complete_slot, db:Session = Depend
                 )
                 db.add(data)
                 db.commit()   
-                return(data_entry)
+                return{'output' : data_entry}
         else:
             raise HTTPException(status_code=405, detail="trying to book from more than customers in one private ride")
-        
-        
     else:
         return{'slot already on that date time'}
