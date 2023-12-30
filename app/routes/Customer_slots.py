@@ -83,6 +83,22 @@ def add_new_customer_slots(cust_slot : schema.Complete_slot, db:Session = Depend
                     db.add(customer_data)
                     db.commit()
                     customer_id = db.query(model.Customers.id).filter(model.Customers.Customer_name == customer_name).first()
+                    data_entry = {
+                        "customer_name" : customer_name,
+                        "customer_id" : customer_id,
+                        "customer_drop_priority" : shared_cust_list,
+                        "driver_id" : driver_alotted_Resp['driver_id'],
+                        "driver_name" : driver_alotted_Resp['driver_name'],
+                        "vehicle_number" : driver_alotted_Resp['vehicle_number'],
+                        "driver_vehicle" : str(driver_alotted_Resp['vehicle_number']),
+                        "booked_time_slot" : ride_time,
+                        "pincode" : driver_alotted_Resp['pincode'],
+                        "pickup_location" : pickup_locs,
+                        "drop_location" : drop_locs,
+                        "booked_dates" : ride_date,
+                        "Ride_type" : ride_type,
+                        "co_passenger" : ""
+                    }
                 data = model.AllSlots(
                     customer_name = customer_name,
                     customer_id = customer_id,
@@ -101,6 +117,9 @@ def add_new_customer_slots(cust_slot : schema.Complete_slot, db:Session = Depend
                 )
                 db.add(data)
                 db.commit()
+                
+                return (data_entry)
+                 
         elif ride_type.lower() == "shared":
             shared_cust_list = []
             for i in customer_data:
@@ -118,6 +137,24 @@ def add_new_customer_slots(cust_slot : schema.Complete_slot, db:Session = Depend
                     db.add(customer_data)
                     db.commit()
                     customer_id = db.query(model.Customers.id).filter(model.Customers.Customer_name == customer_name).first()
+                
+                    data_entry = {
+                        "customer_name" : customer_name,
+                        "customer_id" : customer_id,
+                        "customer_drop_priority" : shared_cust_list,
+                        "driver_id" : driver_alotted_Resp['driver_id'],
+                        "driver_name" : driver_alotted_Resp['driver_name'],
+                        "vehicle_number" : driver_alotted_Resp['vehicle_number'],
+                        "driver_vehicle" : str(driver_alotted_Resp['vehicle_number']),
+                        "booked_time_slot" : ride_time,
+                        "pincode" : driver_alotted_Resp['pincode'],
+                        "pickup_location" : pickup_locs,
+                        "drop_location" : drop_locs,
+                        "booked_dates" : ride_date,
+                        "Ride_type" : ride_type,
+                        "co_passenger" : ""
+                    }   
+                
                 data = model.AllSlots(
                     customer_name = [customer_name],
                     customer_id = customer_id,
@@ -135,9 +172,11 @@ def add_new_customer_slots(cust_slot : schema.Complete_slot, db:Session = Depend
                     co_passenger = co_passenger
                 )
                 db.add(data)
-                db.commit()    
+                db.commit()   
+                return(data_entry)
         else:
             raise HTTPException(status_code=405, detail="trying to book from more than customers in one private ride")
+        
         
     else:
         return{'slot already on that date time'}
