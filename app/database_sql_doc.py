@@ -6,7 +6,7 @@ from psycopg2.extras import RealDictCursor
 import time
 from .config import settings
 
-SQLALCHEMY_DATABASE_URL = f'postgresql://{settings.database_username}:{settings.database_password}@{settings.database_hostname}:{settings.database_port}/{settings.database_name}'
+SQLALCHEMY_DATABASE_URL = f'postgresql://telkestech%40gmail.com:ShXixZT5YV6u@ep-red-bird-68334114.ap-southeast-1.aws.neon.tech/GeoServiceability?sslmode=require'
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 
