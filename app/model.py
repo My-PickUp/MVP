@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, CheckConstraint, Time,func,Date, Float
-from database_sql_doc import Base
+from app.database_sql_doc import Base
 from sqlalchemy.dialects.postgresql import ARRAY
 
 class Drivers(Base):
