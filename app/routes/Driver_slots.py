@@ -1,7 +1,7 @@
 from fastapi import FastAPI, APIRouter, Depends, HTTPException
-from ..database_sql_doc import engine,get_db
+from app.database_sql_doc import engine,get_db
 from sqlalchemy.orm import Session
-from .. import model,schema
+from app import model,schema
 
 model.Base.metadata.create_all(bind = engine)
 
