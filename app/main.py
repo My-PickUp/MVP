@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .routes import Vehicle_allocation, Customer_slots, Driver_slots
-from . import model
-from .database_sql_doc import engine
+from routes import Vehicle_allocation, Customer_slots, Driver_slots
+import model
+from database_sql_doc import engine
  
 app = FastAPI()
 
