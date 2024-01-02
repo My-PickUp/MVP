@@ -1,7 +1,7 @@
 from fastapi import FastAPI, APIRouter,Depends
-from ..database_sql_doc import engine,get_db
+from app.database_sql_doc import engine,get_db
 from sqlalchemy.orm import Session
-from .. import model,schema
+from app import model,schema
 from sqlalchemy import Time, Date,text
 import datetime
 from datetime import time,datetime
